@@ -1,0 +1,20 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir streamlit python-dotenv
+
+COPY frontend/app.py ./frontend/app.py
+
+RUN useradd --create-home documind && chown -R documind /app
+USER documind
+
+EXPOSE 8501
+
+HEALTHCHECK CMD curl -f http://localhost:8501/_stcore/health || exit 1
+
+CMD ["streamlit", "run", "frontend/app.py", \
+     "--server.address=0.0.0.0", "--server.port=8501", "--server.headless=true"]

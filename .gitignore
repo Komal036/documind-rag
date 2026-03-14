@@ -1,0 +1,77 @@
+# ════════════════════════════════════════════════════════
+#  DocuMind .gitignore
+# ════════════════════════════════════════════════════════
+
+# ── Secrets — NEVER commit these ─────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Python ────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.Python
+pip-wheel-metadata/
+
+# ── Virtual environments ──────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+documind-env/
+
+# ── Data — don't commit real documents ───────────────────
+data/raw/
+data/processed/
+# Keep samples (small test docs for demo purposes)
+!data/samples/
+
+# ── Vector store — too large for git ─────────────────────
+vector_store/chroma_db/
+*.bin
+*.parquet
+
+# ── Model weights cache ───────────────────────────────────
+.model_cache/
+*.safetensors
+*.pt
+*.pth
+
+# ── Logs ─────────────────────────────────────────────────
+logs/
+*.log
+
+# ── Test & coverage ───────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+.mypy_cache/
+.ruff_cache/
+
+# ── Jupyter Notebooks ────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ── IDE ───────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Docker ────────────────────────────────────────────────
+*.env.docker
+
+# ── Node (React frontend) ─────────────────────────────────
+frontend/react_app/node_modules/
+frontend/react_app/.next/
+frontend/react_app/build/

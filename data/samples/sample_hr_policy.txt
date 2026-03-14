@@ -1,0 +1,35 @@
+ACME Corporation — Employee Handbook
+Version 3.1 | Last Updated: January 2025
+
+SECTION 3: REMOTE WORK POLICY
+
+3.1 Eligibility
+All full-time employees who have completed their 90-day probationary period
+are eligible to apply for remote work arrangements. Contractors and part-time
+employees must obtain explicit written approval from their department head.
+
+3.2 Remote Work Days
+Eligible employees may work remotely up to 3 days per week. The specific days
+must be agreed upon with the direct manager at least one week in advance.
+Core collaboration hours (10:00 AM - 3:00 PM local time) must be maintained.
+
+3.3 Equipment and Security
+The company provides: one laptop computer, one external monitor, and a standard
+peripherals kit. Employees must use company-issued VPN for all work activities.
+Personal devices may not be used to access company systems without IT approval.
+
+3.4 Contractor Remote Work
+Contractors must submit Form RW-01 at least 5 business days before the intended
+remote work start date. The form requires manager and HR co-signatures. Approval
+is at the sole discretion of the project manager and cannot be appealed.
+
+SECTION 4: EXPENSE REIMBURSEMENT
+
+4.1 Approved Expenses
+Employees may claim reimbursement for: business travel, client entertainment
+(up to $150 per person), professional development courses, and home office
+equipment (up to $500 per calendar year with manager pre-approval).
+
+4.2 Submission Deadlines
+All expense claims must be submitted within 30 days of the expense being
+incurred. Late submissions will not be reimbursed without CFO approval.
