@@ -1,6 +1,6 @@
 # 🧠 DocuMind — Enterprise RAG System
 
-> Production-quality Retrieval-Augmented Generation system. Upload documents, ask questions, get grounded answers with citations.
+> Production-quality Retrieval-Augmented Generation system. Upload documents, ask questions, get grounded answers with citations .
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green.svg)](https://fastapi.tiangolo.com)
