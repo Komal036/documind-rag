@@ -100,11 +100,23 @@ class RAGPipeline:
             top_n=cfg.retrieval.reranking_top_n,
         )
 
-        # 5. LLM generator
+        # 5. LLM generator — pick the right model/key for whichever provider is configured
+        if cfg.llm.llm_provider == "openai":
+            model_name = cfg.llm.openai_model
+            api_key = cfg.llm.openai_api_key
+        elif cfg.llm.llm_provider == "groq":
+            model_name = cfg.llm.groq_model
+            api_key = cfg.llm.groq_api_key
+        elif cfg.llm.llm_provider == "mistral":
+            model_name = cfg.llm.mistral_model
+            api_key = cfg.llm.mistral_api_key
+        else:
+            raise ValueError(f"Unsupported LLM provider: {cfg.llm.llm_provider}")
+
         self._generator = AnswerGenerator(
             llm_provider=cfg.llm.llm_provider,
-            model_name=cfg.llm.openai_model,
-            api_key=cfg.llm.openai_api_key,
+            model_name=model_name,
+            api_key=api_key,
             temperature=cfg.llm.openai_temperature,
             max_tokens=cfg.llm.openai_max_tokens,
         )

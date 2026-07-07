@@ -6,6 +6,7 @@ prompt, and calls the configured LLM to produce a cited answer.
 
 Supports:
   • OpenAI GPT-4o / GPT-4o-mini  (default)
+  • Groq (Llama models, free tier)
   • Mistral via LangChain
 
 The prompt is engineered for enterprise Q&A:
@@ -82,7 +83,7 @@ class AnswerGenerator:
     Generates grounded answers from retrieved context using an LLM.
 
     Args:
-        llm_provider:  "openai" or "mistral".
+        llm_provider:  "openai", "groq", or "mistral".
         model_name:    Model identifier (e.g. "gpt-4o-mini").
         api_key:       Provider API key.
         temperature:   Sampling temperature (0 = deterministic).
@@ -110,6 +111,15 @@ class AnswerGenerator:
             return self._llm
 
         if self.llm_provider == "openai":
+            from langchain_openai import ChatOpenAI
+
+            self._llm = ChatOpenAI(
+                model=self.model_name,
+                api_key=self.api_key,
+                temperature=self.temperature,
+                max_tokens=self.max_tokens,
+            )
+        elif self.llm_provider == "groq":
             from langchain_groq import ChatGroq
 
             self._llm = ChatGroq(
@@ -130,7 +140,7 @@ class AnswerGenerator:
         else:
             raise LLMError(
                 f"Unsupported LLM provider: '{self.llm_provider}'",
-                details={"supported": ["openai", "mistral"]},
+                details={"supported": ["openai", "mistral", "groq"]},
             )
 
         logger.info(
