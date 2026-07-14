@@ -19,7 +19,7 @@ from __future__ import annotations
 from typing import Dict, List, Optional, Tuple
 
 from langchain_core.documents import Document
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 from src.utils.exceptions import LLMContextTooLongError, LLMError, LLMRateLimitError
 from src.utils.logger import get_logger
@@ -154,13 +154,18 @@ class AnswerGenerator:
         self,
         query: str,
         chunks: List[Tuple[Document, float]],
+        chat_history: Optional[List[Dict[str, str]]] = None,
     ) -> Dict:
         """
         Generate a grounded, cited answer for the user query.
 
         Args:
-            query:  User's question.
-            chunks: Re-ranked (Document, score) pairs from the retriever.
+            query:        User's question.
+            chunks:       Re-ranked (Document, score) pairs from the retriever.
+            chat_history: Prior turns in this conversation, oldest first, each
+                          a dict like {"role": "user"|"assistant", "content": "..."}.
+                          Used so follow-up questions ("what about X?") resolve
+                          correctly against earlier context.
 
         Returns:
             Dict with keys:
@@ -191,12 +196,16 @@ class AnswerGenerator:
             query=query[:80],
             num_chunks=len(chunks),
             model=self.model_name,
+            history_turns=len(chat_history) if chat_history else 0,
         )
 
-        messages = [
-            SystemMessage(content=SYSTEM_PROMPT),
-            HumanMessage(content=human_content),
-        ]
+        messages = [SystemMessage(content=SYSTEM_PROMPT)]
+        for turn in chat_history or []:
+            if turn.get("role") == "user":
+                messages.append(HumanMessage(content=turn["content"]))
+            elif turn.get("role") == "assistant":
+                messages.append(AIMessage(content=turn["content"]))
+        messages.append(HumanMessage(content=human_content))
 
         try:
             llm = self._get_llm()

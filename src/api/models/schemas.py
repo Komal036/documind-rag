@@ -28,6 +28,31 @@ class ErrorResponse(BaseModel):
     request_id: Optional[str] = None
 
 
+# ── Auth ──────────────────────────────────────────────────────────────
+
+class SignupRequest(BaseModel):
+    email: str = Field(..., examples=["komal@example.com"])
+    password: str = Field(..., min_length=8, max_length=128)
+    full_name: Optional[str] = Field(default=None)
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class UserResponse(BaseModel):
+    id: str
+    email: str
+    full_name: Optional[str] = None
+    is_active: bool
+
+
 # ── Ingest ────────────────────────────────────────────────────────────
 
 class IngestResponse(BaseModel):
@@ -64,6 +89,15 @@ class QueryRequest(BaseModel):
         le=20,
         description="Override number of re-ranked chunks passed to LLM",
     )
+    session_id: Optional[str] = Field(
+        default=None,
+        description="Chat session ID for multi-turn memory. Create one via POST /api/v1/chat/sessions.",
+    )
+
+
+class ChatSessionResponse(BaseModel):
+    session_id: str
+    title: Optional[str] = None
 
 
 class QueryResponse(BaseModel):
