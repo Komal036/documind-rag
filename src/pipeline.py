@@ -11,6 +11,8 @@ All components are initialised here and wired together.
 """
 from __future__ import annotations
 
+import os
+import uuid
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -34,7 +36,7 @@ class RAGPipeline:
 
     Components initialised once at startup:
       • EmbeddingGenerator  — sentence-transformers model
-      • ChromaVectorStore   — persistent local vector DB
+      • ChromaVectorStore / PgVectorStore — persistent vector DB
       • SemanticRetriever   — embeds queries + runs similarity search
       • CrossEncoderReranker — cross-encoder for precise re-scoring
       • AnswerGenerator     — LLM answer generation with citations
@@ -44,10 +46,10 @@ class RAGPipeline:
         pipeline.initialize()
 
         # Ingest a document
-        result = pipeline.ingest_document(Path("report.pdf"))
+        result = pipeline.ingest_document(Path("report.pdf"), user_id=user.id)
 
         # Query
-        answer = pipeline.query("What is the vacation policy?")
+        answer = pipeline.query("What is the vacation policy?", user_id=user.id)
     """
 
     def __init__(self) -> None:
@@ -126,7 +128,7 @@ class RAGPipeline:
 
     # ── Ingestion ─────────────────────────────────────────────────────
 
-    def ingest_document(self, file_path: Path) -> Dict:
+    def ingest_document(self, file_path: Path, user_id: Optional[uuid.UUID] = None) -> Dict:
         """
         Load, chunk, embed, and store a document.
 
@@ -160,7 +162,15 @@ class RAGPipeline:
         embeddings = self._embedder.embed_texts(texts)
 
         # Store
-        ids = self._vector_store.add_documents(chunks, embeddings)
+        store_kwargs = {}
+        if self._settings.vector_store.vector_store_type == "pgvector":
+            store_kwargs = {
+                "user_id": user_id,
+                "filename": file_path.name,
+                "file_type": file_path.suffix.lstrip("."),
+                "file_size_bytes": os.path.getsize(file_path),
+            }
+        ids = self._vector_store.add_documents(chunks, embeddings, **store_kwargs)
 
         sha256 = docs[0].metadata.get("sha256", "")
         logger.info(
@@ -185,15 +195,18 @@ class RAGPipeline:
         use_reranker: bool = True,
         top_k: Optional[int] = None,
         top_n: Optional[int] = None,
+        user_id: Optional[uuid.UUID] = None,
+        chat_history: Optional[List[Dict[str, str]]] = None,
     ) -> Dict:
         """
         Run the full RAG pipeline for a user question.
 
         Args:
-            question:    Natural language question.
+            question:     Natural language question.
             use_reranker: Whether to apply cross-encoder re-ranking.
-            top_k:       Override retrieval top_k.
-            top_n:       Override reranking top_n.
+            top_k:        Override retrieval top_k.
+            top_n:        Override reranking top_n.
+            user_id:      Scope retrieval to this user's documents (pgvector only).
 
         Returns:
             Dict with keys: answer, sources, model, provider, chunks_used.
@@ -202,7 +215,10 @@ class RAGPipeline:
         logger.info("Processing query", question=question[:80])
 
         # Retrieve
-        candidates = self._retriever.retrieve(question, top_k=top_k)
+        retrieve_kwargs = {}
+        if self._settings.vector_store.vector_store_type == "pgvector":
+            retrieve_kwargs = {"user_id": user_id}
+        candidates = self._retriever.retrieve(question, top_k=top_k, **retrieve_kwargs)
 
         if not candidates:
             return {
@@ -221,28 +237,36 @@ class RAGPipeline:
             final_chunks = candidates[:n]
 
         # Generate
-        result = self._generator.generate(question, final_chunks)
+        result = self._generator.generate(question, final_chunks, chat_history=chat_history)
         result["chunks_used"] = len(final_chunks)
 
         return result
 
     # ── Utility ───────────────────────────────────────────────────────
 
-    def get_stats(self) -> Dict:
-        """Return current vector store stats."""
+    def get_stats(self, user_id: Optional[uuid.UUID] = None) -> Dict:
+        """Return current vector store stats, optionally scoped to a user."""
         self._check_initialized()
+        count_kwargs = {}
+        sources_kwargs = {}
+        if self._settings.vector_store.vector_store_type == "pgvector":
+            count_kwargs = {"user_id": user_id}
+            sources_kwargs = {"user_id": user_id}
         return {
-            "total_chunks": self._vector_store.count(),
-            "indexed_files": self._vector_store.list_sources(),
+            "total_chunks": self._vector_store.count(**count_kwargs),
+            "indexed_files": self._vector_store.list_sources(**sources_kwargs),
             "embedding_model": self._settings.embedding.embedding_model_name,
             "llm_model": self._settings.llm.openai_model,
             "vector_store": self._settings.vector_store.vector_store_type,
         }
 
-    def delete_document(self, source: str) -> Dict:
-        """Remove all chunks from a source document."""
+    def delete_document(self, source: str, user_id: Optional[uuid.UUID] = None) -> Dict:
+        """Remove all chunks from a source document, optionally scoped to a user."""
         self._check_initialized()
-        count = self._vector_store.delete_by_source(source)
+        delete_kwargs = {}
+        if self._settings.vector_store.vector_store_type == "pgvector":
+            delete_kwargs = {"user_id": user_id}
+        count = self._vector_store.delete_by_source(source, **delete_kwargs)
         return {"deleted_chunks": count, "source": source}
 
     def _check_initialized(self) -> None:

@@ -49,6 +49,7 @@ class SemanticRetriever:
         query: str,
         top_k: Optional[int] = None,
         filter_metadata: Optional[dict] = None,
+        user_id=None,
     ) -> List[Tuple[Document, float]]:
         """
         Embed the query and retrieve similar chunks from the vector store.
@@ -80,10 +81,14 @@ class SemanticRetriever:
             ) from exc
 
         try:
+            search_kwargs = {}
+            if user_id is not None:
+                search_kwargs["user_id"] = user_id
             results = self.vector_store.similarity_search(
                 query_embedding=query_vec,
                 top_k=k,
                 filter_metadata=filter_metadata,
+                **search_kwargs,
             )
         except Exception as exc:
             raise RetrievalError(

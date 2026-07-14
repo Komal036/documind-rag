@@ -19,7 +19,12 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
 from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
 
+from src.auth.dependencies import get_current_user
+from src.db.connection import get_db
+from src.db.models import ChatSession, Message, User
+from src.memory.chat_memory import append_turn, get_recent_history
 from src.api.models.schemas import (
     DeleteResponse,
     ErrorResponse,
@@ -77,6 +82,7 @@ async def health_check():
 async def ingest_document(
     file: UploadFile = File(..., description="PDF, TXT, DOCX, or MD file"),
     pipeline: RAGPipeline = Depends(get_pipeline),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Upload a document, chunk it, embed it, and store it in the vector DB.
@@ -111,7 +117,7 @@ async def ingest_document(
             )
 
         try:
-            result = pipeline.ingest_document(tmp_path)
+            result = pipeline.ingest_document(tmp_path, user_id=current_user.id)
         except (UnsupportedFileTypeError, FileTooLargeError) as exc:
             raise HTTPException(status_code=400, detail=str(exc))
         except DocuMindError as exc:
@@ -138,12 +144,35 @@ async def ingest_document(
 async def query_documents(
     body: QueryRequest,
     pipeline: RAGPipeline = Depends(get_pipeline),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
     """
     Retrieve relevant passages and generate a grounded, cited answer.
+
+    If session_id is provided, prior turns in that session are used as
+    conversation context, and this exchange is appended to it.
     """
     request_id = str(uuid.uuid4())[:8]
     logger.info("Query request", question=body.question[:80], request_id=request_id)
+
+    chat_history = None
+    session_uuid = None
+    if body.session_id:
+        try:
+            session_uuid = uuid.UUID(body.session_id)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid session_id format.")
+
+        session = (
+            db.query(ChatSession)
+            .filter(ChatSession.id == session_uuid, ChatSession.user_id == current_user.id)
+            .first()
+        )
+        if session is None:
+            raise HTTPException(status_code=404, detail="Chat session not found.")
+
+        chat_history = get_recent_history(session_uuid)
 
     try:
         result = pipeline.query(
@@ -151,6 +180,8 @@ async def query_documents(
             use_reranker=body.use_reranker,
             top_k=body.top_k,
             top_n=body.top_n,
+            user_id=current_user.id,
+            chat_history=chat_history,
         )
     except RetrievalError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
@@ -159,6 +190,13 @@ async def query_documents(
     except DocuMindError as exc:
         logger.error("Query failed", error=str(exc), request_id=request_id)
         raise HTTPException(status_code=500, detail=str(exc))
+
+    if session_uuid is not None:
+        append_turn(session_uuid, "user", body.question)
+        append_turn(session_uuid, "assistant", result["answer"])
+        db.add(Message(session_id=session_uuid, role="user", content=body.question))
+        db.add(Message(session_id=session_uuid, role="assistant", content=result["answer"]))
+        db.commit()
 
     return QueryResponse(
         answer=result["answer"],
@@ -178,9 +216,12 @@ async def query_documents(
     tags=["System"],
     summary="Vector store and pipeline statistics",
 )
-async def get_stats(pipeline: RAGPipeline = Depends(get_pipeline)):
+async def get_stats(
+    pipeline: RAGPipeline = Depends(get_pipeline),
+    current_user: User = Depends(get_current_user),
+):
     """Returns current statistics about indexed documents and the pipeline."""
-    stats = pipeline.get_stats()
+    stats = pipeline.get_stats(user_id=current_user.id)
     return StatsResponse(**stats)
 
 
@@ -195,10 +236,11 @@ async def get_stats(pipeline: RAGPipeline = Depends(get_pipeline)):
 async def delete_document(
     filename: str,
     pipeline: RAGPipeline = Depends(get_pipeline),
+    current_user: User = Depends(get_current_user),
 ):
     """Delete all chunks associated with a given filename from the vector DB."""
     try:
-        result = pipeline.delete_document(source=filename)
+        result = pipeline.delete_document(source=filename, user_id=current_user.id)
     except DocuMindError as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
