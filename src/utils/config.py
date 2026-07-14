@@ -45,7 +45,7 @@ class EmbeddingSettings(BaseSettings):
 class VectorStoreSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=PROJECT_ROOT / ".env", extra="ignore")
 
-    vector_store_type: Literal["chroma", "pinecone"] = Field(
+    vector_store_type: Literal["chroma", "pinecone", "pgvector"] = Field(
         default="chroma", alias="VECTOR_STORE_TYPE"
     )
     chroma_persist_dir: str = Field(
@@ -85,6 +85,39 @@ class RetrievalSettings(BaseSettings):
         default="cross-encoder/ms-marco-MiniLM-L-6-v2", alias="RERANKER_MODEL_NAME"
     )
     similarity_threshold: float = Field(default=0.3, alias="SIMILARITY_THRESHOLD")
+
+
+class DatabaseSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=PROJECT_ROOT / ".env", extra="ignore")
+
+    database_url: str = Field(
+        default="postgresql+psycopg2://postgres:postgres@localhost:5432/documind",
+        alias="DATABASE_URL",
+    )
+    db_pool_size: int = Field(default=5, alias="DB_POOL_SIZE")
+    db_max_overflow: int = Field(default=10, alias="DB_MAX_OVERFLOW")
+    db_echo: bool = Field(default=False, alias="DB_ECHO")
+
+
+class RedisSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=PROJECT_ROOT / ".env", extra="ignore")
+
+    redis_host: str = Field(default="localhost", alias="REDIS_HOST")
+    redis_port: int = Field(default=6379, alias="REDIS_PORT")
+    redis_chat_ttl_seconds: int = Field(default=86400, alias="REDIS_CHAT_TTL_SECONDS")
+    redis_max_turns: int = Field(default=10, alias="REDIS_MAX_TURNS")
+
+
+class AuthSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=PROJECT_ROOT / ".env", extra="ignore")
+
+    jwt_secret_key: str = Field(
+        default="dev-secret-change-in-prod", alias="JWT_SECRET_KEY"
+    )
+    jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
+    jwt_access_token_expire_minutes: int = Field(
+        default=60 * 24, alias="JWT_ACCESS_TOKEN_EXPIRE_MINUTES"  # 24h default
+    )
 
 
 class APISettings(BaseSettings):
@@ -163,6 +196,18 @@ class Settings(BaseSettings):
     @property
     def api(self) -> APISettings:
         return APISettings()
+
+    @property
+    def database(self) -> DatabaseSettings:
+        return DatabaseSettings()
+
+    @property
+    def auth(self) -> AuthSettings:
+        return AuthSettings()
+
+    @property
+    def redis(self) -> RedisSettings:
+        return RedisSettings()
 
     @property
     def logging(self) -> LoggingSettings:

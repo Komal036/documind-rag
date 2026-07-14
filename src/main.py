@@ -20,6 +20,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from src.api.routes.api_routes import router
+from src.api.routes.auth_routes import router as auth_router
+from src.api.routes.chat_routes import router as chat_router
 from src.pipeline import RAGPipeline
 from src.utils.config import get_settings
 from src.utils.exceptions import DocuMindError
@@ -109,6 +111,8 @@ async def generic_exception_handler(request: Request, exc: Exception):
 # ── Routes ────────────────────────────────────────────────────────────
 
 app.include_router(router)
+app.include_router(auth_router)
+app.include_router(chat_router)
 
 
 # ── Dev runner ────────────────────────────────────────────────────────
