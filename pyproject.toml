@@ -33,10 +33,17 @@ exclude = ["notebooks/", "tests/"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
 asyncio_mode = "auto"
 addopts = "-v --tb=short --cov=src --cov-report=term-missing"
 log_cli = true
 log_cli_level = "INFO"
+markers = [
+    "slow: marks tests as slow",
+    "integration: marks integration tests requiring models",
+]
 
 [tool.coverage.run]
 source = ["src"]
@@ -45,18 +52,3 @@ omit = ["*/tests/*", "*/__init__.py"]
 [tool.coverage.report]
 fail_under = 70
 show_missing = true
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = "-v --tb=short"
-markers = [
-    "slow: marks tests as slow",
-    "integration: marks integration tests requiring models",
-]
-
-[tool.coverage.run]
-source = ["src"]
-omit = ["tests/*"]
