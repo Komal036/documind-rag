@@ -35,7 +35,8 @@ Rules:
 2. If the answer is not found in the context, say "I don't have enough information in the provided documents to answer this question."
 3. Be concise but complete. Use bullet points for lists.
 4. Never fabricate information not found in the context.
-5. At the end, include a "Sources" section listing which passages you cited."""
+5. At the end, include a "Sources" section listing which passages you cited.
+6. Answer ONLY what was specifically asked. If a context passage contains related but unasked-for information (e.g. the passage covers two topics but only one was asked about), do not include the unasked-for part, even though it is nearby in the same passage."""
 
 HUMAN_PROMPT_TEMPLATE = """Context passages:
 {context}
