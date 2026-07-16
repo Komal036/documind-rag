@@ -242,6 +242,18 @@ class RAGPipeline:
 
         return result
 
+    def self_rag_query(self, question: str, user_id: Optional[uuid.UUID] = None) -> Dict:
+        """
+        v2 query path: confidence-gated retrieval loop with query
+        reformulation (see src/agentic/self_rag.py). Falls back to
+        generating an answer (which will naturally refuse if context is
+        weak) once the retry budget is exhausted — never loops forever.
+        """
+        self._check_initialized()
+        from src.agentic.self_rag import run_self_rag
+
+        return run_self_rag(self, question, user_id=user_id)
+
     # ── Utility ───────────────────────────────────────────────────────
 
     def get_stats(self, user_id: Optional[uuid.UUID] = None) -> Dict:

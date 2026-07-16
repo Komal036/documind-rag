@@ -93,6 +93,10 @@ class QueryRequest(BaseModel):
         default=None,
         description="Chat session ID for multi-turn memory. Create one via POST /api/v1/chat/sessions.",
     )
+    use_self_rag: bool = Field(
+        default=False,
+        description="v2: use the confidence-gated Self-RAG retrieval loop instead of single-pass retrieval.",
+    )
 
 
 class ChatSessionResponse(BaseModel):
@@ -107,6 +111,8 @@ class QueryResponse(BaseModel):
     provider: str
     chunks_used: int
     question: str
+    self_rag_retries: Optional[int] = None
+    self_rag_reformulations: Optional[List[str]] = None
 
 
 # ── Stats ─────────────────────────────────────────────────────────────

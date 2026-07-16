@@ -175,14 +175,21 @@ async def query_documents(
         chat_history = get_recent_history(session_uuid)
 
     try:
-        result = pipeline.query(
-            question=body.question,
-            use_reranker=body.use_reranker,
-            top_k=body.top_k,
-            top_n=body.top_n,
-            user_id=current_user.id,
-            chat_history=chat_history,
-        )
+        if body.use_self_rag:
+            # v2 path: confidence-gated retrieval loop. Chat history isn't
+            # threaded into this path yet — it's evaluated as a single-shot
+            # retrieval strategy for now, kept separate from v1 for a clean
+            # RAGAS comparison.
+            result = pipeline.self_rag_query(question=body.question, user_id=current_user.id)
+        else:
+            result = pipeline.query(
+                question=body.question,
+                use_reranker=body.use_reranker,
+                top_k=body.top_k,
+                top_n=body.top_n,
+                user_id=current_user.id,
+                chat_history=chat_history,
+            )
     except RetrievalError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     except LLMError as exc:
@@ -205,6 +212,8 @@ async def query_documents(
         provider=result["provider"],
         chunks_used=result["chunks_used"],
         question=body.question,
+        self_rag_retries=result.get("self_rag_retries"),
+        self_rag_reformulations=result.get("self_rag_reformulations"),
     )
 
 

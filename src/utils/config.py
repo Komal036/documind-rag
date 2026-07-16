@@ -108,6 +108,17 @@ class RedisSettings(BaseSettings):
     redis_max_turns: int = Field(default=10, alias="REDIS_MAX_TURNS")
 
 
+class SelfRAGSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=PROJECT_ROOT / ".env", extra="ignore")
+
+    self_rag_max_retries: int = Field(default=2, alias="SELF_RAG_MAX_RETRIES")
+    # Reranker (cross-encoder) raw score threshold above which retrieval is
+    # considered "confident enough" to answer without reformulating the query.
+    # Empirically, this reranker's scores for genuinely relevant top chunks
+    # tend to land above ~1.0; weak/irrelevant matches trend negative.
+    self_rag_confidence_threshold: float = Field(default=1.0, alias="SELF_RAG_CONFIDENCE_THRESHOLD")
+
+
 class AuthSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=PROJECT_ROOT / ".env", extra="ignore")
 
@@ -208,6 +219,10 @@ class Settings(BaseSettings):
     @property
     def redis(self) -> RedisSettings:
         return RedisSettings()
+
+    @property
+    def self_rag(self) -> SelfRAGSettings:
+        return SelfRAGSettings()
 
     @property
     def logging(self) -> LoggingSettings:

@@ -44,9 +44,16 @@ httpx==0.28.1
 ragas>=0.2.15
 datasets>=3.5.0
 unstructured>=0.17.2
-
 # ── Database & Migrations ────────────────────────────────────────────
 sqlalchemy==2.0.51
 alembic==1.14.0
 psycopg2-binary==2.9.12
 pgvector==0.4.2
+python-jose[cryptography]==3.5.0
+bcrypt==5.0.0
+redis==8.0.1
+openai==1.109.1
+
+# ── Agentic / Self-RAG ────────────────────────────────────────────────
+langgraph==0.2.76
+langchain-groq==0.3.8
