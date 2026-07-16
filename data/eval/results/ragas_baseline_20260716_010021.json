@@ -1,0 +1,72 @@
+{
+  "timestamp": "20260716_010021",
+  "num_questions": 8,
+  "avg_faithfulness": 1.0,
+  "avg_answer_relevancy": 0.797539999148346,
+  "rows": [
+    {
+      "question": "Who is eligible to apply for remote work?",
+      "ground_truth": "All full-time employees who have completed their 90-day probationary period are eligible to apply for remote work arrangements.",
+      "answer": "Eligible individuals for remote work include:\n* All full-time employees who have completed their 90-day probationary period [1]\n* Contractors and part-time employees, but only with explicit written approval from their department head [1]\n\nSources:\n[1] sample_hr_policy.txt",
+      "num_contexts": 4,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9495500893370572
+    },
+    {
+      "question": "How many days per week can eligible employees work remotely?",
+      "ground_truth": "Eligible employees may work remotely up to 3 days per week, with the specific days agreed upon with their direct manager at least one week in advance.",
+      "answer": "Eligible employees may work remotely up to 3 days per week [1]. \n\nSources:\n[1] (Source: sample_hr_policy.txt, page ?)",
+      "num_contexts": 4,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9999999999998993
+    },
+    {
+      "question": "What are the core collaboration hours for remote workers?",
+      "ground_truth": "Remote workers must maintain core collaboration hours of 10:00 AM to 3:00 PM local time.",
+      "answer": "The core collaboration hours for remote workers are 10:00 AM - 3:00 PM local time [1]. \n\nSources:\n[1] sample_hr_policy.txt",
+      "num_contexts": 3,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9999999999999996
+    },
+    {
+      "question": "What equipment does the company provide for remote work?",
+      "ground_truth": "The company provides a laptop computer, an external monitor, and a standard peripherals kit.",
+      "answer": "The company provides the following equipment for remote work:\n* One laptop computer\n* One external monitor\n* A standard peripherals kit [1]\n\nEmployees are also required to use company-issued VPN for all work activities [1].\n\nSources:\n[1]",
+      "num_contexts": 3,
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0000000000000002
+    },
+    {
+      "question": "What security requirement applies to remote work activities?",
+      "ground_truth": "Employees must use the company-issued VPN for all work activities while working remotely.",
+      "answer": "Employees must use company-issued VPN for all work activities [3]. Additionally, personal devices may not be used to access company systems without IT approval [3].\n\nSources:\n[3] (Source: sample_hr_policy.txt, page ?)",
+      "num_contexts": 4,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.43457200153118763
+    },
+    {
+      "question": "What form must contractors submit to work remotely?",
+      "ground_truth": "Contractors must submit Form RW-01 at least 5 business days before the intended remote work start date, with manager and HR co-signatures.",
+      "answer": "Contractors must submit Form RW-01 to work remotely [1]. \n\nSources:\n[1]",
+      "num_contexts": 4,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9999999999999684
+    },
+    {
+      "question": "Who has final approval authority over a contractor's remote work request?",
+      "ground_truth": "Approval for contractor remote work is at the sole discretion of the project manager.",
+      "answer": "The project manager has the final approval authority over a contractor's remote work request [1]. This approval is at the sole discretion of the project manager and cannot be appealed [1]. \n\nSources:\n[1] sample_hr_policy.txt",
+      "num_contexts": 3,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9961979023186561
+    },
+    {
+      "question": "What is the company's policy on unlimited paid vacation for executives?",
+      "ground_truth": "The provided documents do not contain information about an unlimited paid vacation policy for executives.",
+      "answer": "I don't have enough information in the provided documents to answer this question.\n\nSources: \nNone cited, as the provided passages [1] and [2] do not mention unlimited paid vacation for executives.",
+      "num_contexts": 2,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.0
+    }
+  ]
+}

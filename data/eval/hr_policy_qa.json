@@ -1,0 +1,34 @@
+[
+  {
+    "question": "Who is eligible to apply for remote work?",
+    "ground_truth": "All full-time employees who have completed their 90-day probationary period are eligible to apply for remote work arrangements."
+  },
+  {
+    "question": "How many days per week can eligible employees work remotely?",
+    "ground_truth": "Eligible employees may work remotely up to 3 days per week, with the specific days agreed upon with their direct manager at least one week in advance."
+  },
+  {
+    "question": "What are the core collaboration hours for remote workers?",
+    "ground_truth": "Remote workers must maintain core collaboration hours of 10:00 AM to 3:00 PM local time."
+  },
+  {
+    "question": "What equipment does the company provide for remote work?",
+    "ground_truth": "The company provides a laptop computer, an external monitor, and a standard peripherals kit."
+  },
+  {
+    "question": "What security requirement applies to remote work activities?",
+    "ground_truth": "Employees must use the company-issued VPN for all work activities while working remotely."
+  },
+  {
+    "question": "What form must contractors submit to work remotely?",
+    "ground_truth": "Contractors must submit Form RW-01 at least 5 business days before the intended remote work start date, with manager and HR co-signatures."
+  },
+  {
+    "question": "Who has final approval authority over a contractor's remote work request?",
+    "ground_truth": "Approval for contractor remote work is at the sole discretion of the project manager."
+  },
+  {
+    "question": "What is the company's policy on unlimited paid vacation for executives?",
+    "ground_truth": "The provided documents do not contain information about an unlimited paid vacation policy for executives."
+  }
+]
