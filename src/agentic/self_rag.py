@@ -113,6 +113,7 @@ def build_self_rag_graph(pipeline):
         result["self_rag_retries"] = state["retry_count"]
         result["self_rag_reformulations"] = state["reformulation_history"]
         result["self_rag_final_confidence"] = state["top_score"]
+        result["contexts"] = [doc.page_content for doc, _score in state["candidates"]]
         return {"result": result}
 
     graph = StateGraph(SelfRAGState)
