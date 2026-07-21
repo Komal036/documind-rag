@@ -10,6 +10,7 @@ mistralai==1.7.0
 
 # ── Embeddings ────────────────────────────────────────────────────────
 sentence-transformers==4.1.0
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch>=2.5.0
 transformers==4.51.3
 
