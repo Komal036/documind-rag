@@ -52,7 +52,7 @@ pgvector==0.4.2
 python-jose[cryptography]==3.5.0
 bcrypt==5.0.0
 redis==8.0.1
-openai==1.109.1
+
 
 # ── Agentic / Self-RAG ────────────────────────────────────────────────
 langgraph==0.2.76
