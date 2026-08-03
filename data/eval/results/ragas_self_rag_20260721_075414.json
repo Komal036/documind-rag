@@ -1,0 +1,103 @@
+{
+  "mode": "self_rag",
+  "timestamp": "20260721_075414",
+  "num_questions": 8,
+  "avg_faithfulness": 0.875,
+  "avg_answer_relevancy": 0.8336001755837722,
+  "rows": [
+    {
+      "question": "Who is eligible to apply for remote work?",
+      "ground_truth": "All full-time employees who have completed their 90-day probationary period are eligible to apply for remote work arrangements.",
+      "answer": "- Full\u2011time employees who have completed their 90\u2011day probationary period are eligible to apply for remote\u2011work arrangements\u30101\u3011.",
+      "num_contexts": 4,
+      "is_refusal": false,
+      "self_rag_retries": 0,
+      "self_rag_reformulations": [],
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.8994819693582056
+    },
+    {
+      "question": "How many days per week can eligible employees work remotely?",
+      "ground_truth": "Eligible employees may work remotely up to 3 days per week, with the specific days agreed upon with their direct manager at least one week in advance.",
+      "answer": "- Eligible employees may work remotely up to **3 days per week**\u30101\u3011.\n\n**Sources**\n- [1] Remote Work Days policy.",
+      "num_contexts": 4,
+      "is_refusal": false,
+      "self_rag_retries": 0,
+      "self_rag_reformulations": [],
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9999999999998993
+    },
+    {
+      "question": "What are the core collaboration hours for remote workers?",
+      "ground_truth": "Remote workers must maintain core collaboration hours of 10:00 AM to 3:00 PM local time.",
+      "answer": "- Core collaboration hours for remote workers are **10:00\u202fAM\u202f\u2013\u202f3:00\u202fPM local time**\u30101\u3011.\n\n**Sources**\n- [1] Remote Work Days section, sample_hr_policy.txt.",
+      "num_contexts": 3,
+      "is_refusal": false,
+      "self_rag_retries": 0,
+      "self_rag_reformulations": [],
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9999999999999996
+    },
+    {
+      "question": "What equipment does the company provide for remote work?",
+      "ground_truth": "The company provides a laptop computer, an external monitor, and a standard peripherals kit.",
+      "answer": "- One laptop computer  \n- One external monitor  \n- A standard peripherals kit  \n\n**Sources**  \n[1]",
+      "num_contexts": 3,
+      "is_refusal": false,
+      "self_rag_retries": 0,
+      "self_rag_reformulations": [],
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.30476579181594343
+    },
+    {
+      "question": "What security requirement applies to remote work activities?",
+      "ground_truth": "Employees must use the company-issued VPN for all work activities while working remotely.",
+      "answer": "- Employees must use the company\u2011issued VPN for all work activities while working remotely\u30103\u3011.  \n\n**Sources**  \n[3]\u200b",
+      "num_contexts": 4,
+      "is_refusal": false,
+      "self_rag_retries": 2,
+      "self_rag_reformulations": [
+        "Which security requirement or control governs remote work (telecommuting) activities?",
+        "What security requirement or control specifically addresses remote work (telecommuting) and work\u2011from\u2011home activities?"
+      ],
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.7563347538671402
+    },
+    {
+      "question": "What form must contractors submit to work remotely?",
+      "ground_truth": "Contractors must submit Form RW-01 at least 5 business days before the intended remote work start date, with manager and HR co-signatures.",
+      "answer": "- Contractors must submit **Form RW\u201101** to work remotely\u30101\u3011.\n\n**Sources**\n- \u30101\u3011<|endoftext|>**Problem:\u00a0\u00a0\u00a0\u00a0)\u00a0\u00a0\u00a0---\u00a0\u00a0)\u00a0\u00a0)\u00a0...\r\n**\r\n\r\n\u00a0\r\n\r\n\u00a0\r\n)\u00a0\r\n\u00a0\r\n\u00a0\r\n\r\n\r\n\u00a0\r\n\u00a0...\r\n\u2026\u00a0\r\n\u2026\u2026\u2026\r\n\u2026\u2026\u2026\r\n...\r\n\r\n\r\n\u00a0\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u00a0\r\n\r\n\u00a0\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u00a0\r\n\r\n\u2026\u00a0\r\n\u2026\u00a0\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\u00a0\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\u00a0\r\n\u2026\u00a0\r\n\u2026\u00a0\u2026\u00a0\r\n\u2026\u2026\u00a0\r\n\r\n\r\n\u2026\u2026\u00a0\u2026\r\n\u2026\u00a0\r\n\r\n\r\n\r\n\r\n\u2026\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\r\n\r\n\u2026\r\n\r\n\u2026\r\n\r\nWe\u2026\r\n\u2026\u2026\r\n\u2026\u00a0\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\r\n\u2026\r\n\r\n\r\n\r\n\u2026\r\n\u2026\r\n\r\n\r\n\u2026\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\r\n\r\n\u2026\r\n\u2026\u2026\r\n\u2026\u00a0\r\n\u2026\u2026\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\r\n\u2026\r\n\r\n\u2026\r\n\r\n\u2026\r\n\u2026\r\n\r\n\r\n\r\n\u2026\r\n\u2026\r\n\u2026\u00a0\r\n\u2026\u2026\r\n\r\n\u2026\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\r\n\u2026\r\n...\r\n\u2026\u2026\r\n\u2026\u2026\r\n\u2026\r\n\u2026\r\n\r\n\u2026\r\n\u2026\r\n\u2026\r\n\u2026\r\n\r\n\u2026\u2026\r\n\u2026\u00a0\r\n\u2026\u2026\r\n\u2026\n\nThe\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\r\n\u00a0\r\n\u00a0\r\n\r\n\u00a0\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u00a0\r\n\u00a0\r\n\r\n\u2026\u00a0\r\n\u2026\u00a0\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\u00a0\r\n\r\n\u00a0\r\n\u00a0\u2026\u00a0\r\n\u2026\u00a0\u2026\r\n\u2026\u00a0\r\n\r\n\u2026\n\n\u2026\n\n\u2026\u00a0\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\u00a0\r\n\u2026\u00a0\u2026\u2026\u00a0\r\n\u2026\u00a0\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\u00a0\r\n\r\n\u2026\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\u00a0\r\n\r\n\u2026\u00a0\r\n\u2026\r\n\r\n\u2026\n\n\u2026\n\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\r\n\u2026\r\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\u2026\n\n\r\n\u2026\r\n\r\n\u00a0\u00a0\u00a0\u00a0\u2026\n\n\u2026\u00a0\r\n\r\n\r\n\u2026\n\n\r\n\r\n\r\n\u2026\n\n\r\n\u2026\r\n\u2026\n\n\r\n\r\n\r\n\r\n\r\n\u00a0\r\n\u2026\n\n\r\n\r\n\u2026\n\n\r\n\u2026\u00a0\r\n\r\n\r\n\u2026\n\n\r\n\r\n\r\n\u2026\n\n\r\n\u2026\n\n\r\n\u2026\n\n\r\n\u2026\u00a0\r\n\r\n\u00a0\r\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\u2026\n\n\r\n\u2026\n\n\r\n\u2026\n\n\n\n\n\nWe\u2026\r\n\r\n\u00a0\r\n\r\n\u2026\u2026\r\n\u2026\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\u2026\r\n\r\n\r\n\u2026\n\n\n\n\n\n\r\n\r\n\r\n\u2026\r\n\r\n\r\n\u2026\n\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\u2026\r\n\r\n\u2026\r\n\u2026\u2026\r\n\u2026\u00a0\r\n....\r\n\u2026\u2026\r\n\r\n\r\n\u2026\n\n\n\n\n\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\u2026\n\n\r\n\r\n\u2026\n\n\r\n\u2026\n\n\n\n\n\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\u00a0\r\n\r\n\r\n\u2026\n\n\r\n\u2026\n\n\n\n\n\n\r\nWe\u2026\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\u2026\n\n\r\n\u2026\u00a0\r\n\u2026\u2026\r\n\u2026\u00a0\r\n\r\n\u2026\n\n\r\n\u2026\n\n\r\n\u2026\n\n\r\n\u2026\r\n\r\n\u2026\r\n\u2026\u2026\n\n\u2026\u00a0\r\n\u2026\n\n\r\n\u2026\r\n\r\n\r\n\u2026\n\n\r\n\u2026\n\n\n\n\n\n\u2026\n\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\r\n\u2026\n\n\r\n\u2026\u00a0\r\n\u2026\r\n\r\n\u2026\n\n\n\n\n\n\r\n\u2026\n\n\r\n\r\n\r\n\u2026\n\n\n\n\n\n\r\n\u2026\r\n\r\n\r\n\u2026\n\n\n\n\n\n\r\n\u2026\r\n\r\n\u2026\n\n\n\n\n\n\r\n\u2026\r\n\u2026\n\n\n\n\n\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\u2026\n\n\r\n\r\n\u2026\n\n\r\n\u2026\n\n\n\n\n\n\r\nWe\u2026\r\nWe\u2026\r\nWe\u2026\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\r\n\u2026\n\n\n\n\n\n\r\n\u2026\u2026\r\n\u2026\r\n\u2026\u2026\n\n\r\n\u2026\r\n\n\n\n\n\r\n\u2026\n\n\n\n\n\n\r\n\u2026\n\n\r\n\r\n\r\n\u2026\n\n\n\n\n\n\r\n\u2026\r\n\u2026\n\n\n\n\n\n\r\n\u2026\r\n\u2026\n\n\n\n\n\n\r\n\u2026\r\n\r\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\u2026\n\n\n\n\n\n\r\n\u2026\n\n\r\n\r\n\r\n\r\n\u2026\n\n\r\n\r\n\u2026\n\n\n\n\n\n\r\nWe\u2026\r\n\u2026\n\n\u2026\u00a0\r\n\n\n\n\n\u2026\n\n\n\n\n\n\r\n\r\n\r\n\n\n\n\n\r\n\r\n\n\n\n\n\n\n\n\n\r\n\r\n\n\n\n\n\r\n\u2026\n\n\n\n\n\n\r\n\u2026\r\n\r\n\u2026\n\n\n\n\n\n\r\n\u2026\n\n\n\n\n\n\r\n\u2026\r\n\u2026\n\n\n\n\n\n\r\n\u2026\r\n\r\n\u2026\n\n\n\n\n\n\r\n",
+      "num_contexts": 4,
+      "is_refusal": false,
+      "self_rag_retries": 0,
+      "self_rag_reformulations": [],
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9999999999999684
+    },
+    {
+      "question": "Who has final approval authority over a contractor's remote work request?",
+      "ground_truth": "Approval for contractor remote work is at the sole discretion of the project manager.",
+      "answer": "- The project manager has the sole discretion to approve a contractor\u2019s remote\u2011work request\u30101\u3011.\n\n**Sources**\n- \u30101\u3011sample_hr_policy.txt, Contractor Remote Work section.",
+      "num_contexts": 3,
+      "is_refusal": false,
+      "self_rag_retries": 0,
+      "self_rag_reformulations": [],
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.8746187140452492
+    },
+    {
+      "question": "What is the company's policy on unlimited paid vacation for executives?",
+      "ground_truth": "The provided documents do not contain information about an unlimited paid vacation policy for executives.",
+      "answer": "I don't have enough information in the provided documents to answer this question.\n\n**Sources**  \nNone.",
+      "num_contexts": 3,
+      "is_refusal": true,
+      "self_rag_retries": 2,
+      "self_rag_reformulations": [
+        "Company executive unlimited paid time off policy handbook or HR guidelines",
+        "company C-level unlimited paid time off policy HR handbook guidelines"
+      ],
+      "faithfulness": 0.0,
+      "answer_relevancy": 0.0
+    }
+  ]
+}

@@ -13,6 +13,8 @@ permanent record of every message lives in Postgres (ChatSession /
 Message tables) — Redis is not the source of truth, it's a fast recent
 window.
 """
+
+
 from __future__ import annotations
 
 import json
@@ -37,7 +39,10 @@ def get_redis_client() -> "redis.Redis":
         _client = redis.Redis(
             host=settings.redis.redis_host,
             port=settings.redis.redis_port,
+            password=settings.redis.redis_password or None,
+            ssl=settings.redis.redis_ssl,
             decode_responses=True,
+            protocol=2,
         )
     return _client
 

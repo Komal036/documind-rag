@@ -104,9 +104,10 @@ class RedisSettings(BaseSettings):
 
     redis_host: str = Field(default="localhost", alias="REDIS_HOST")
     redis_port: int = Field(default=6379, alias="REDIS_PORT")
+    redis_password: str = Field(default="", alias="REDIS_PASSWORD")
+    redis_ssl: bool = Field(default=False, alias="REDIS_SSL")
     redis_chat_ttl_seconds: int = Field(default=86400, alias="REDIS_CHAT_TTL_SECONDS")
     redis_max_turns: int = Field(default=10, alias="REDIS_MAX_TURNS")
-
 
 class SelfRAGSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=PROJECT_ROOT / ".env", extra="ignore")

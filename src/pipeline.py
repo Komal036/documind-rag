@@ -224,7 +224,9 @@ class RAGPipeline:
             return {
                 "answer": "I couldn't find any relevant information in the uploaded documents.",
                 "sources": [],
-                "model": self._settings.llm.openai_model,
+                "model": self._settings.llm.groq_model if self._settings.llm.llm_provider == "groq"
+                 else self._settings.llm.mistral_model if self._settings.llm.llm_provider == "mistral"
+                 else self._settings.llm.openai_model,
                 "provider": self._settings.llm.llm_provider,
                 "chunks_used": 0,
             }
@@ -287,10 +289,8 @@ class RAGPipeline:
                 "RAGPipeline has not been initialised. Call pipeline.initialize() first."
             )
 
-
 # ── Module-level singleton ────────────────────────────────────────────
 _pipeline_instance: Optional[RAGPipeline] = None
-
 
 def get_pipeline() -> RAGPipeline:
     """Return the process-wide RAGPipeline singleton (initialised on first call)."""
