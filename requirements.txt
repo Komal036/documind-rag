@@ -9,10 +9,9 @@ openai==1.75.0
 mistralai==1.7.0
 
 # ── Embeddings ────────────────────────────────────────────────────────
-sentence-transformers==4.1.0
---extra-index-url https://download.pytorch.org/whl/cpu
-torch>=2.5.0
-transformers==4.51.3
+fastembed>=0.4.1
+onnxruntime>=1.17.0
+tokenizers>=0.15.0
 
 # ── Vector Databases ─────────────────────────────────────────────────
 chromadb==1.0.4

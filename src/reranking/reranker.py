@@ -1,17 +1,19 @@
 """
 DocuMind Cross-Encoder Re-Ranker
 ----------------------------------
+Pure ONNX implementation of cross-encoder scoring to avoid PyTorch memory bloat.
 Takes the top_k candidates from the semantic retriever and re-scores them
-using a cross-encoder model, which reads the query and each passage jointly
-(much more accurate than bi-encoder similarity alone).
-
-Model default: cross-encoder/ms-marco-MiniLM-L-6-v2
-  — fast (~50ms for 20 candidates on CPU), strong MRR on MS MARCO.
+using a cross-encoder model.
 """
 from __future__ import annotations
 
+import os
 from typing import List, Optional, Tuple
+import numpy as np
 
+from huggingface_hub import snapshot_download
+import onnxruntime as ort
+from tokenizers import Tokenizer
 from langchain_core.documents import Document
 
 from src.utils.exceptions import RerankerError
@@ -22,17 +24,12 @@ logger = get_logger(__name__)
 
 class CrossEncoderReranker:
     """
-    Re-ranks retrieval candidates using a cross-encoder model.
-
-    The cross-encoder scores each (query, passage) pair jointly, giving
-    much higher accuracy than cosine similarity at the cost of more compute.
-    It is applied only to the small candidate set (top_k ≤ 20) so latency
-    remains acceptable (~50–200 ms on CPU).
+    Re-ranks retrieval candidates using an ONNX cross-encoder model.
 
     Args:
-        model_name: HuggingFace model identifier for a cross-encoder.
+        model_name: HuggingFace model identifier (defaults to ms-marco-MiniLM-L-6-v2)
         top_n:      Number of chunks to return after re-ranking.
-        device:     "cpu" | "cuda". Auto-detected if None.
+        device:     Ignored in ONNX CPU mode, kept for compatibility.
     """
 
     def __init__(
@@ -41,27 +38,44 @@ class CrossEncoderReranker:
         top_n: int = 5,
         device: Optional[str] = None,
     ) -> None:
-        self.model_name = model_name
+        # map sentence-transformers name to Xenova's ONNX repo
+        if model_name == "cross-encoder/ms-marco-MiniLM-L-6-v2":
+            self.model_name = "Xenova/ms-marco-MiniLM-L-6-v2"
+        else:
+            self.model_name = model_name
+            
         self.top_n = top_n
-        self._device = device
-        self._model = None
+        self._session = None
+        self._tokenizer = None
 
     def _load(self):
-        """Lazy-load the cross-encoder model."""
-        if self._model is not None:
+        """Lazy-load the ONNX cross-encoder model and tokenizer."""
+        if self._session is not None:
             return
 
-        import torch
-        from sentence_transformers import CrossEncoder
-
-        device = self._device or ("cuda" if torch.cuda.is_available() else "cpu")
-        logger.info("Loading cross-encoder", model=self.model_name, device=device)
+        logger.info("Loading ONNX cross-encoder", model=self.model_name)
         try:
-            self._model = CrossEncoder(self.model_name, device=device)
-            logger.info("Cross-encoder loaded", model=self.model_name)
+            # Download weights and config from HF Hub
+            model_path = snapshot_download(repo_id=self.model_name)
+            
+            onnx_path = os.path.join(model_path, "onnx", "model.onnx")
+            if not os.path.exists(onnx_path):
+                # Fallback to root directory if 'onnx' subdir doesn't exist
+                onnx_path = os.path.join(model_path, "model.onnx")
+                
+            # Initialize ONNX Runtime session
+            self._session = ort.InferenceSession(onnx_path, providers=["CPUExecutionProvider"])
+            
+            # Initialize Rust-based tokenizer
+            tokenizer_path = os.path.join(model_path, "tokenizer.json")
+            self._tokenizer = Tokenizer.from_file(tokenizer_path)
+            self._tokenizer.enable_truncation(max_length=512)
+            self._tokenizer.enable_padding(pad_id=0, pad_token="[PAD]")
+            
+            logger.info("ONNX Cross-encoder loaded", model=self.model_name)
         except Exception as exc:
             raise RerankerError(
-                f"Failed to load cross-encoder '{self.model_name}': {exc}"
+                f"Failed to load ONNX cross-encoder '{self.model_name}': {exc}"
             ) from exc
 
     def rerank(
@@ -71,18 +85,7 @@ class CrossEncoderReranker:
         top_n: Optional[int] = None,
     ) -> List[Tuple[Document, float]]:
         """
-        Re-score and sort candidates by cross-encoder relevance.
-
-        Args:
-            query:      User's original query string.
-            candidates: List of (Document, bi-encoder-score) from retriever.
-            top_n:      Override the instance-level top_n for this call.
-
-        Returns:
-            Sorted list of (Document, cross_encoder_score), length ≤ top_n.
-
-        Raises:
-            RerankerError: If model inference fails.
+        Re-score and sort candidates by cross-encoder relevance using ONNX.
         """
         if not candidates:
             return []
@@ -90,13 +93,34 @@ class CrossEncoderReranker:
         n = top_n or self.top_n
         self._load()
 
+        # Cross-encoder evaluates (query, document) pairs jointly
         pairs = [(query, doc.page_content) for doc, _ in candidates]
 
         try:
-            scores = self._model.predict(pairs)  # returns numpy array
+            # Tokenize all pairs in a batch
+            encoded = self._tokenizer.encode_batch(pairs)
+            
+            # Prepare inputs for ONNX format
+            input_ids = np.array([e.ids for e in encoded], dtype=np.int64)
+            attention_mask = np.array([e.attention_mask for e in encoded], dtype=np.int64)
+            token_type_ids = np.array([e.type_ids for e in encoded], dtype=np.int64)
+            
+            ort_inputs = {
+                "input_ids": input_ids,
+                "attention_mask": attention_mask,
+                "token_type_ids": token_type_ids
+            }
+            
+            # Run inference
+            ort_outs = self._session.run(None, ort_inputs)
+            logits = ort_outs[0]
+            
+            # Flatten to get raw scores for each candidate
+            scores = logits.flatten()
+            
         except Exception as exc:
             raise RerankerError(
-                f"Cross-encoder inference failed: {exc}",
+                f"Cross-encoder ONNX inference failed: {exc}",
                 details={"num_candidates": len(candidates)},
             ) from exc
 
@@ -114,7 +138,7 @@ class CrossEncoderReranker:
             results.append((doc, float(score)))
 
         logger.info(
-            "Re-ranking complete",
+            "Re-ranking complete (ONNX)",
             input_candidates=len(candidates),
             output_chunks=len(results),
         )
