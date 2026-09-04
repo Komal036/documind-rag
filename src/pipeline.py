@@ -107,7 +107,7 @@ class RAGPipeline:
             model_name = cfg.llm.openai_model
             api_key = cfg.llm.openai_api_key
         elif cfg.llm.llm_provider == "groq":
-            model_name = cfg.llm.groq_model
+            model_name = "llama3-70b-8192"  # Force valid model, ignore env var
             api_key = cfg.llm.groq_api_key
         elif cfg.llm.llm_provider == "mistral":
             model_name = cfg.llm.mistral_model
@@ -224,7 +224,7 @@ class RAGPipeline:
             return {
                 "answer": "I couldn't find any relevant information in the uploaded documents.",
                 "sources": [],
-                "model": self._settings.llm.groq_model if self._settings.llm.llm_provider == "groq"
+                "model": "llama3-70b-8192" if self._settings.llm.llm_provider == "groq"
                  else self._settings.llm.mistral_model if self._settings.llm.llm_provider == "mistral"
                  else self._settings.llm.openai_model,
                 "provider": self._settings.llm.llm_provider,
