@@ -25,7 +25,7 @@ class LLMSettings(BaseSettings):
     mistral_api_key: str = Field(default="", alias="MISTRAL_API_KEY")
     mistral_model: str = Field(default="mistral-small", alias="MISTRAL_MODEL")
     groq_api_key: str = Field(default="", alias="GROQ_API_KEY")
-    groq_model: str = Field(default="llama-3.3-70b-versatile", alias="GROQ_MODEL")
+    groq_model: str = Field(default="openai/gpt-oss-120b", alias="GROQ_MODEL")
     llm_provider: Literal["openai", "mistral", "groq"] = Field(default="openai", alias="LLM_PROVIDER")
 
 

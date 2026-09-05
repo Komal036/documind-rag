@@ -111,6 +111,15 @@ class AnswerGenerator:
         if self._llm is not None:
             return self._llm
 
+        # timeout: max seconds to wait on a single LLM API call before
+        # raising an exception. max_retries=1 prevents LangChain's default
+        # retry/backoff behaviour from silently extending a hang well past
+        # this timeout. Without these, a dead/rejected model or a network
+        # hiccup can leave a request stuck indefinitely until the hosting
+        # platform's own process timeout kills the whole container.
+        REQUEST_TIMEOUT_SECONDS = 30
+        MAX_RETRIES = 1
+
         if self.llm_provider == "openai":
             from langchain_openai import ChatOpenAI
 
@@ -119,6 +128,8 @@ class AnswerGenerator:
                 api_key=self.api_key,
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
+                timeout=REQUEST_TIMEOUT_SECONDS,
+                max_retries=MAX_RETRIES,
             )
         elif self.llm_provider == "groq":
             from langchain_groq import ChatGroq
@@ -128,6 +139,8 @@ class AnswerGenerator:
                 api_key=self.api_key,
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
+                timeout=REQUEST_TIMEOUT_SECONDS,
+                max_retries=MAX_RETRIES,
             )
         elif self.llm_provider == "mistral":
             from langchain_community.chat_models import ChatMistralAI
@@ -137,6 +150,8 @@ class AnswerGenerator:
                 api_key=self.api_key,
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
+                timeout=REQUEST_TIMEOUT_SECONDS,
+                max_retries=MAX_RETRIES,
             )
         else:
             raise LLMError(
