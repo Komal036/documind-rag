@@ -49,6 +49,7 @@ class EmbeddingGenerator:
             self._model = TextEmbedding(
                 model_name=self.model_name,
                 cache_dir=self.cache_dir,
+                threads=1,
             )
             logger.info("ONNX Embedding model loaded", model=self.model_name)
         except Exception as exc:
