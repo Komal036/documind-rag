@@ -64,7 +64,10 @@ class CrossEncoderReranker:
                 onnx_path = os.path.join(model_path, "model.onnx")
                 
             # Initialize ONNX Runtime session
-            self._session = ort.InferenceSession(onnx_path, providers=["CPUExecutionProvider"])
+            sess_options = ort.SessionOptions()
+            sess_options.intra_op_num_threads = 1
+            sess_options.inter_op_num_threads = 1
+            self._session = ort.InferenceSession(onnx_path, sess_options=sess_options, providers=["CPUExecutionProvider"])
             
             # Initialize Rust-based tokenizer
             tokenizer_path = os.path.join(model_path, "tokenizer.json")
@@ -105,18 +108,26 @@ class CrossEncoderReranker:
             attention_mask = np.array([e.attention_mask for e in encoded], dtype=np.int64)
             token_type_ids = np.array([e.type_ids for e in encoded], dtype=np.int64)
             
-            ort_inputs = {
-                "input_ids": input_ids,
-                "attention_mask": attention_mask,
-                "token_type_ids": token_type_ids
-            }
+            # Process in smaller batches to prevent OOM
+            batch_size = 4
+            all_scores = []
             
-            # Run inference
-            ort_outs = self._session.run(None, ort_inputs)
-            logits = ort_outs[0]
+            for i in range(0, len(input_ids), batch_size):
+                ort_inputs = {
+                    "input_ids": input_ids[i:i+batch_size],
+                    "attention_mask": attention_mask[i:i+batch_size],
+                    "token_type_ids": token_type_ids[i:i+batch_size]
+                }
+                
+                # Run inference for this mini-batch
+                ort_outs = self._session.run(None, ort_inputs)
+                logits = ort_outs[0]
+                
+                # Flatten to get raw scores for each candidate
+                scores = logits.flatten()
+                all_scores.extend(scores.tolist())
             
-            # Flatten to get raw scores for each candidate
-            scores = logits.flatten()
+            scores = np.array(all_scores)
             
         except Exception as exc:
             raise RerankerError(
