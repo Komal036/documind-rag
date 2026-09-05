@@ -58,17 +58,25 @@ class CrossEncoderReranker:
             # Download weights and config from HF Hub
             model_path = snapshot_download(repo_id=self.model_name)
             
-            onnx_path = os.path.join(model_path, "onnx", "model.onnx")
+            # Prefer the quantized (int8) variant — roughly 4x smaller in memory
+            # than fp32, which matters a lot under Render's 512MB free-tier ceiling.
+            onnx_path = os.path.join(model_path, "onnx", "model_quantized.onnx")
             if not os.path.exists(onnx_path):
-                # Fallback to root directory if 'onnx' subdir doesn't exist
+                onnx_path = os.path.join(model_path, "onnx", "model.onnx")
+            if not os.path.exists(onnx_path):
                 onnx_path = os.path.join(model_path, "model.onnx")
-                
+
             # Initialize ONNX Runtime session
             sess_options = ort.SessionOptions()
             sess_options.intra_op_num_threads = 1
             sess_options.inter_op_num_threads = 1
-            self._session = ort.InferenceSession(onnx_path, sess_options=sess_options, providers=["CPUExecutionProvider"])
-            
+            sess_options.enable_mem_pattern = False
+            sess_options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+
+            self._session = ort.InferenceSession(
+                onnx_path, sess_options=sess_options, providers=["CPUExecutionProvider"]
+            )
+
             # Initialize Rust-based tokenizer
             tokenizer_path = os.path.join(model_path, "tokenizer.json")
             self._tokenizer = Tokenizer.from_file(tokenizer_path)

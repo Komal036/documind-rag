@@ -101,6 +101,7 @@ class RAGPipeline:
             model_name=cfg.retrieval.reranker_model_name,
             top_n=cfg.retrieval.reranking_top_n,
         )
+        self._reranker._load()  # force download + load now, not on first query
 
         # 5. LLM generator — pick the right model/key for whichever provider is configured
         if cfg.llm.llm_provider == "openai":
