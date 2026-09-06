@@ -82,7 +82,7 @@ class RetrievalSettings(BaseSettings):
     retrieval_top_k: int = Field(default=20, alias="RETRIEVAL_TOP_K")
     reranking_top_n: int = Field(default=5, alias="RERANKING_TOP_N")
     reranker_model_name: str = Field(
-        default="cross-encoder/ms-marco-MiniLM-L-6-v2", alias="RERANKER_MODEL_NAME"
+        default="cross-encoder/ms-marco-TinyBERT-L-2-v2", alias="RERANKER_MODEL_NAME"
     )
     similarity_threshold: float = Field(default=0.3, alias="SIMILARITY_THRESHOLD")
 

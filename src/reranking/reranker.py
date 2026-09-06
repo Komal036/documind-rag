@@ -39,10 +39,11 @@ class CrossEncoderReranker:
         device: Optional[str] = None,
     ) -> None:
         # map sentence-transformers name to Xenova's ONNX repo
-        if model_name == "cross-encoder/ms-marco-MiniLM-L-6-v2":
-            self.model_name = "Xenova/ms-marco-MiniLM-L-6-v2"
-        else:
-            self.model_name = model_name
+        _MODEL_MAP = {
+            "cross-encoder/ms-marco-MiniLM-L-6-v2": "Xenova/ms-marco-MiniLM-L-6-v2",
+            "cross-encoder/ms-marco-TinyBERT-L-2-v2": "Xenova/ms-marco-TinyBERT-L-2-v2",
+        }
+        self.model_name = _MODEL_MAP.get(model_name, model_name)
             
         self.top_n = top_n
         self._session = None
