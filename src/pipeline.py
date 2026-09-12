@@ -153,38 +153,61 @@ class RAGPipeline:
         if not chunks:
             return {
                 "filename": file_path.name,
-                "sha256": docs[0].metadata.get("sha256", ""),
+                "sha256": docs[0].metadata.get("sha256", "") if docs else "",
                 "chunk_count": 0,
                 "status": "no_content",
             }
 
-        # Embed
-        texts = [c.page_content for c in chunks]
-        embeddings = self._embedder.embed_texts(texts)
-
-        # Store
         store_kwargs = {}
         if self._settings.vector_store.vector_store_type == "pgvector":
+            import os
             store_kwargs = {
                 "user_id": user_id,
                 "filename": file_path.name,
                 "file_type": file_path.suffix.lstrip("."),
                 "file_size_bytes": os.path.getsize(file_path),
             }
-        ids = self._vector_store.add_documents(chunks, embeddings, **store_kwargs)
 
-        sha256 = docs[0].metadata.get("sha256", "")
+        # Embed and Store in batches to enforce extreme memory limits (512MB RAM safe)
+        import gc
+        batch_size = self._settings.embedding.embedding_batch_size
+        total_ids = []
+
+        for i in range(0, len(chunks), batch_size):
+            batch_chunks = chunks[i : i + batch_size]
+            texts = [c.page_content for c in batch_chunks]
+            
+            # Embed this specific batch
+            embeddings = self._embedder.embed_texts(texts)
+            
+            # Store this specific batch
+            ids = self._vector_store.add_documents(batch_chunks, embeddings, **store_kwargs)
+            total_ids.extend(ids)
+            
+            # Aggressive memory cleanup after every single batch
+            del batch_chunks
+            del texts
+            del embeddings
+            gc.collect()
+
+        sha256 = docs[0].metadata.get("sha256", "") if docs else ""
         logger.info(
             "Document ingested",
             filename=file_path.name,
-            chunks=len(ids),
+            chunks=len(total_ids),
             sha256=sha256[:8],
         )
+
+        # Critical Memory Management: 
+        # Unload the fastembed ONNX model completely to free ~200MB RAM for the next pipeline process
+        if hasattr(self._embedder, "_model"):
+            self._embedder._model = None
+            gc.collect()
 
         return {
             "filename": file_path.name,
             "sha256": sha256,
-            "chunk_count": len(ids),
+            "chunk_count": len(total_ids),
             "status": "success",
         }
 
