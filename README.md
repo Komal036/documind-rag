@@ -1,6 +1,9 @@
-# 🧠 DocuMind — Enterprise RAG System
+# 🧠 DocuMind — Full-Stack Enterprise RAG System
 
-> Retrieval-Augmented Generation system with authentication, per-user document isolation, multi-turn conversational memory, and a confidence-gated self-correcting retrieval loop. Upload documents, ask questions, get grounded answers with citations.
+> A production-ready Retrieval-Augmented Generation (RAG) application with JWT authentication, per-user document isolation, multi-turn conversational memory, and a confidence-gated self-correcting retrieval loop.
+
+**Live Demo (Frontend):** [https://documind-rag-six.vercel.app](https://documind-rag-six.vercel.app)
+**Live API (Backend):** Hosted on Render
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green.svg)](https://fastapi.tiangolo.com)
@@ -9,18 +12,16 @@
 
 ---
 
-## ✨ Features
+## ✨ Key Features & Architecture
 
-- **Authentication** — JWT-based signup/login, bcrypt password hashing. All document, chat, and query data is scoped per user.
-- **Document Ingestion** — PDF, TXT, DOCX, MD (PyMuPDF + pdfplumber fallback)
-- **Chunking** — RecursiveCharacterTextSplitter (512 chars, 50 overlap)
-- **Two-Stage Retrieval** — `sentence-transformers/all-MiniLM-L6-v2` bi-encoder for candidate retrieval, `ms-marco-MiniLM-L-6-v2` cross-encoder for re-ranking
-- **Vector Store** — PostgreSQL + `pgvector`, with per-user scoped similarity search (ChromaDB also supported as a swappable local-dev backend)
-- **Answer Generation** — Groq (`openai/gpt-oss-120b`) via an OpenAI/Groq/Mistral-pluggable provider layer, with inline `[N]` citations
-- **Multi-Turn Chat Memory** — Redis-backed conversation history per chat session (TTL-based), dual-written to PostgreSQL for a durable message log
-- **Self-RAG (Corrective RAG)** — an opt-in v2 retrieval mode built with LangGraph: retrieval confidence is scored using the reranker's own top score; if confidence is low, the query is automatically reformulated and retried (hard-capped at 2 retries to prevent infinite loops). If confidence never improves, the system explicitly declines to answer rather than guessing.
-- **REST API** — FastAPI with OpenAPI docs
-- **Frontend** — React + Vite + Tailwind CSS: login/signup, chat with citations and session memory, document upload/management, live health and stats
+- **Full-Stack Deployment** — React frontend hosted on Vercel, Python FastAPI backend hosted on Render.
+- **Advanced Memory Management** — Architected to process massively large documents (1000+ pages) on a strict 512MB RAM budget. Uses extreme memory control techniques including batched embedding streaming and explicit Python Garbage Collection (`gc.collect()`) to prevent OOM server crashes.
+- **Vector Database (Supabase)** — Uses PostgreSQL + `pgvector` for storing and retrieving high-dimensional vectors, ensuring relational and vector data are kept perfectly in sync.
+- **Local Embeddings & Reranking** — Runs `fastembed` (`all-MiniLM-L6-v2`) entirely locally to generate vector embeddings for free. Uses a **Cross-Encoder Reranker** to deeply score mathematical relationships between the query and the chunk before injecting them into the prompt.
+- **LLM Orchestration (OpenRouter)** — Dynamically routes to dozens of open-source and proprietary models (`gpt-4o`, `llama-3`, etc.) using the OpenAI-compatible LangChain wrapper.
+- **Multi-Turn Chat Memory** — Redis-backed conversation history (Upstash), dual-written to PostgreSQL for a durable message log.
+- **Authentication & Security** — JWT-based signup/login with bcrypt password hashing. All queries and document storage are isolated per user.
+- **Agentic Self-RAG** — Built with LangGraph. Scores retrieval confidence; if confidence is low, the query is automatically reformulated and retried, dramatically reducing LLM hallucinations.
 
 ---
 
