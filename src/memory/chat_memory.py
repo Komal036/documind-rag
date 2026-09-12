@@ -32,18 +32,25 @@ settings = get_settings()
 _client: "redis.Redis | None" = None
 
 
-def get_redis_client() -> "redis.Redis":
+def get_redis_client() -> "redis.Redis | None":
     """Return a process-wide Redis client (lazily created)."""
     global _client
     if _client is None:
-        _client = redis.Redis(
-            host=settings.redis.redis_host,
-            port=settings.redis.redis_port,
-            password=settings.redis.redis_password or None,
-            ssl=settings.redis.redis_ssl,
-            decode_responses=True,
-            protocol=2,
-        )
+        if not settings.redis.redis_host:
+            logger.warning("Redis host not set. Chat memory will be disabled.")
+            return None
+        try:
+            _client = redis.Redis(
+                host=settings.redis.redis_host,
+                port=settings.redis.redis_port,
+                password=settings.redis.redis_password or None,
+                ssl=settings.redis.redis_ssl,
+                decode_responses=True,
+                protocol=2,
+            )
+        except Exception as e:
+            logger.warning(f"Failed to connect to Redis: {e}. Chat memory disabled.")
+            return None
     return _client
 
 
@@ -54,24 +61,40 @@ def _key(session_id: uuid.UUID) -> str:
 def append_turn(session_id: uuid.UUID, role: str, content: str) -> None:
     """Append one turn (user or assistant message) to a session's history."""
     client = get_redis_client()
+    if not client:
+        return
     key = _key(session_id)
     entry = json.dumps({"role": role, "content": content})
 
-    client.rpush(key, entry)
-    # Keep only the most recent N turns (each Q+A pair = 2 entries)
-    max_entries = settings.redis.redis_max_turns * 2
-    client.ltrim(key, -max_entries, -1)
-    client.expire(key, settings.redis.redis_chat_ttl_seconds)
+    try:
+        client.rpush(key, entry)
+        # Keep only the most recent N turns (each Q+A pair = 2 entries)
+        max_entries = settings.redis.redis_max_turns * 2
+        client.ltrim(key, -max_entries, -1)
+        client.expire(key, settings.redis.redis_chat_ttl_seconds)
+    except Exception as e:
+        logger.warning(f"Redis append failed: {e}")
 
 
 def get_recent_history(session_id: uuid.UUID) -> List[Dict[str, str]]:
     """Return this session's recent turns, oldest first."""
     client = get_redis_client()
-    raw_entries = client.lrange(_key(session_id), 0, -1)
-    return [json.loads(entry) for entry in raw_entries]
+    if not client:
+        return []
+    try:
+        raw_entries = client.lrange(_key(session_id), 0, -1)
+        return [json.loads(entry) for entry in raw_entries]
+    except Exception as e:
+        logger.warning(f"Redis lrange failed: {e}")
+        return []
 
 
 def clear_session(session_id: uuid.UUID) -> None:
     """Delete a session's cached history (e.g. on explicit reset)."""
     client = get_redis_client()
-    client.delete(_key(session_id))
+    if not client:
+        return
+    try:
+        client.delete(_key(session_id))
+    except Exception as e:
+        logger.warning(f"Redis delete failed: {e}")

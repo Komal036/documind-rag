@@ -75,3 +75,4 @@ Thumbs.db
 frontend/react_app/node_modules/
 frontend/react_app/.next/
 frontend/react_app/build/
+.vercel

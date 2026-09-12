@@ -1,19 +1,25 @@
 -r requirements.txt
 
-# ── Testing ───────────────────────────────────────────────────────────
+# 🛠️ Evaluation & Dev 🛠️
+ragas>=0.2.15
+datasets>=3.5.0
+langchain-huggingface==0.1.2
+unstructured>=0.17.2
+
+# 🧪 Testing 🧪
 pytest==8.3.5
 pytest-asyncio==0.26.0
 pytest-cov==6.1.0
 pytest-mock==3.14.0
 httpx==0.28.1
 
-# ── Code Quality ─────────────────────────────────────────────────────
+# 🧹 Code Quality 🧹
 ruff==0.11.5
 black==25.1.0
 mypy==1.15.0
 pre-commit==4.2.0
 
-# ── Notebooks ────────────────────────────────────────────────────────
+# 📓 Notebooks 📓
 jupyter==1.1.1
 ipykernel==6.29.5
 matplotlib==3.10.1
