@@ -25,13 +25,33 @@
 
 ---
 
-## 🏗 Architecture
+## 🏗️ Architecture
 
-```
-Document → Load → Chunk → Embed → Store (pgvector)
-Query    → Embed → Retrieve (bi-encoder) → Re-rank (cross-encoder) → Generate (LLM) → Cited answer
-                                                        │
-                                     [Self-RAG v2] confidence check → reformulate → retry (max 2x)
+```mermaid
+graph TD
+    subgraph Ingestion Pipeline
+        A[Document Upload] --> B[PyMuPDF / pdfplumber]
+        B --> C[RecursiveTextSplitter]
+        C --> D[fastembed 'all-MiniLM-L6-v2']
+        D --> E[(Supabase pgvector)]
+    end
+
+    subgraph Query Pipeline
+        F[User Question] --> G[fastembed 'all-MiniLM-L6-v2']
+        G --> H[Vector Similarity Search]
+        H --> E
+        H --> I[Cross-Encoder Reranker]
+        
+        I -->|High Confidence| J[OpenRouter LLM]
+        
+        I -.->|Low Confidence| K[Self-RAG Reformulate]
+        K -.-> F
+        
+        J --> L[Grounded Answer with Citations]
+    end
+
+    style E fill:#336791,stroke:#fff,stroke-width:2px,color:#fff
+    style J fill:#10a37f,stroke:#fff,stroke-width:2px,color:#fff
 ```
 
 **Data model (PostgreSQL, 6 tables):** `User`, `Document`, `Embedding`, `ChatSession`, `Message`, `QueryLog` — managed via SQLAlchemy + Alembic migrations.
