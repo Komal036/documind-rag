@@ -34,7 +34,7 @@ except urllib.error.HTTPError as e:
     print('Ingest error:', e.code, e.read().decode())
 
 # Query
-body = json.dumps({'question':'ensure it gets chunked','use_reranker':True}).encode()
+body = json.dumps({'question':'ensure it gets chunked','use_reranker':False}).encode()
 req = urllib.request.Request('https://documind-api-4ww0.onrender.com/api/v1/query', data=body, headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {token}'})
 try:
     resp = urllib.request.urlopen(req)

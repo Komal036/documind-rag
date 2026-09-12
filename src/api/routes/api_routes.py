@@ -51,7 +51,6 @@ logger = get_logger(__name__)
 router = APIRouter()
 settings = get_settings()
 
-
 # ── Dependency: get pipeline from app state ───────────────────────────
 
 def get_pipeline(request: Request) -> RAGPipeline:
